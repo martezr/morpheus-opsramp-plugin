@@ -1,0 +1,109 @@
+<div class="breadcrumbs-container">
+	<div class="container">					
+		<ul>
+			<li><a href="/admin/integrations">Integrations</a></li>
+			<li><span class="breadcrumb-current">{{name}}</span></li>
+		</ul>
+	</div>
+</div>
+<div class="main container" role="main" style="touch-action: manipulation; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
+	<div class="status-message-container hidden">
+		<div class="status-message-content">
+			<div class="status-msg"></div>
+		</div>
+	</div>
+	<!-- Render Account Header-->
+	<div class="cm resource-detail">
+		<div class="cm-header-info resource-detail" data-cm-id="{{id}}">
+			<div class="pull-right hidden-xs">
+				<a href="/admin/integrations/{{id}}/edit" title="Edit" class="button" data-toggle="modal" data-target="#form-modal">
+					Edit
+				</a>
+				<button class="button button-red hidden-xs" data-toggle="modal" data-target="#delete-cm-modal">Delete</button>
+			</div>
+	<h1 class="">
+			<div class="pull-left">
+				<span class="statusIcon status-provisioned" title="ok"></span>
+			</div>
+		{{name}}
+	</h1>
+	<div class="big-logo-row">
+		<span class="big-logo">
+					<img src="/assets/plugin/opsramp-plugin/opsramp-logo.svg" class="integration-logo">
+		</span>
+	</div>
+	<div class="header-meta-info">
+		<div class="item">
+			<strong>Host: </strong> {{serviceUrl}}
+		</div>
+		
+			<div class="item">
+				<strong>Last Update: </strong>
+				<time datetime="2024-01-17 05:30:13">01/16/2024 11:30 PM</time>
+			</div>
+		<hr>
+	</div>
+</div>
+
+		</div>
+		<!--create modal-->
+		<!--delete modal-->
+		<div class="modal fade" tabindex="-1" role="dialog" id="delete-cm-modal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true"><svg class="close-icon"><use xlink:href="/assets/icons.svg#close-window"></use></svg></span>
+						</button>
+						<h4 class="modal-title">Delete Integration?</h4>
+					</div>
+					<div class="modal-body">
+						
+						<form action="/admin/integrations/{{id}}" method="post" role="form" class="form-horizontal delete-cm-form" data-remote="true"><input type="hidden" name="_method" value="DELETE" id="_method">
+							<p>Are you sure you want to remove this integration?</p>
+							<input type="hidden" name="_csrf" value="ac5d6b9b-bce1-4d44-ad3f-53f40d58cff7">
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+						<button type="button" class="button button-red cm-delete-submit-button" data-loading-text="Deleting..." data-submit="true" data-auto-reset="false">Delete</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--add obj modal-->
+		<div class="modal fade" tabindex="-1" role="dialog" id="new-service-now-obj-ref-modal">
+			<div class="modal-dialog">
+				<div class="modal-content"></div>
+			</div>
+		</div>
+	
+	
+				<!-- reusable modals -->
+				<div class="modal fade" tabindex="-1" role="dialog" id="form-modal" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content"></div>
+					</div>
+				</div>
+				<div class="modal fade" tabindex="-1" role="dialog" id="form-modal-md" aria-hidden="true">
+					<div class="modal-dialog modal-md">
+						<div class="modal-content"></div>
+					</div>
+				</div>
+				<div class="modal fade" tabindex="-1" role="dialog" id="form-modal-lg" aria-hidden="true">
+					<div class="modal-dialog modal-lg">
+						<div class="modal-content"></div>
+					</div>
+				</div>
+				<div class="modal fade" tabindex="-1" role="dialog" id="form-modal-xl" aria-hidden="true">
+					<div class="modal-dialog modal-lg modal-xlg">
+						<div class="modal-content"></div>
+					</div>
+				</div>
+				<div class="modal fade" tabindex="-1" role="dialog" id="form-modal-xxlg" aria-hidden="true">
+					<div class="modal-dialog modal-lg modal-xxlg">
+						<div class="modal-content"></div>
+					</div>
+				</div>
+				<div id="modal"></div>
+			</div>

@@ -1,0 +1,48 @@
+plugins {
+    id "com.bertramlabs.asset-pipeline" version "3.3.2"
+    id "com.github.johnrengelman.plugin-shadow" version "2.0.3"
+}
+
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'maven-publish'
+
+group = 'com.morpheusdata'
+version = '0.0.1'
+
+sourceCompatibility = '1.11'
+targetCompatibility = '1.11'
+
+ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly 'com.morpheusdata:morpheus-plugin-api:1.0.2'
+    compileOnly 'org.codehaus.groovy:groovy-all:2.5.6'
+    compileOnly 'io.reactivex.rxjava3:rxjava:3.1.8'
+    compileOnly "org.slf4j:slf4j-api:1.7.26"
+    compileOnly "org.slf4j:slf4j-parent:1.7.26"
+}
+
+jar {
+    manifest {
+        attributes(
+            'Morpheus-Name': 'OpsRamp Plugin',
+            'Morpheus-Organization': 'morpheus',
+            'Morpheus-Code': 'opsramp-plugin',
+            'Morpheus-Description': 'Plugin for OpsRamp Integration',
+            'Morpheus-Logo': 'assets/opsramp-logo.png',
+            'Morpheus-Logo-Dark': 'assets/opsramp-logo.png',
+            'Morpheus-Labels': 'Plugin, Monitoring, OpsRamp',
+            'Morpheus-Repo': 'https://github.com/martezr/morpheus-opsramp-plugin',
+            'Morpheus-Min-Appliance-Version': "6.3.0",
+            'Plugin-Class': 'com.morpheusdata.opsramp.OpsRampPlugin',
+            'Plugin-Version': archiveVersion.get() // Get version defined in gradle
+        )
+    }
+}
+
+tasks.assemble.dependsOn tasks.shadowJar

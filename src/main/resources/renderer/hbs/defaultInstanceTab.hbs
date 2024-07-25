@@ -1,0 +1,895 @@
+<script nonce="{{webnonce}}" src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script nonce="{{webnonce}}" src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
+
+<ul class="view-type nav nav-pills nav-justified" >
+   <li role="presentation" class="active">
+      <a href="#overview-tab" data-toggle="pill" role="tab">Metrics</a>
+   </li>
+   <li role="presentation">
+      <a href="#alerts-tab" data-toggle="pill" role="tab">Alerts</a>
+   </li>
+   <!--
+   <li role="presentation">
+      <a href="#logs-tab" data-toggle="pill" role="tab">Logs</a>
+   </li>
+   <li role="presentation">
+      <a href="#application-monitoring-tab" data-toggle="pill" role="tab">Application</a>
+   </li>
+   -->
+</ul>
+
+<div class="tab-content">
+   <div id="overview-tab" role="tabpanel" class="tab-pane active">
+<div class="container text-center">
+  <div class="row">
+    <div class="col-sm-6">
+      <div>
+         <canvas id="cpuChart"></canvas>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div>
+         <canvas id="ramChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+   <!-- Second Row -->
+  <div class="row">
+    <div class="col-sm-3">
+      <div>
+         <canvas id="diskReadBytesChart"></canvas>
+      </div>
+    </div>
+    <div class="col-sm-3">
+      <div>
+         <canvas id="diskReadOperationsChart"></canvas>
+      </div>
+    </div>
+    <div class="col-sm-3">
+      <div>
+         <canvas id="diskWriteBytesChart"></canvas>
+      </div>
+    </div>
+    <div class="col-sm-3">
+      <div>
+         <canvas id="diskWriteOperationsChart"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+   <!-- Third Row -->
+  <div class="row">
+    <div class="col-sm-3">
+      <div>
+         <canvas id="networkOutChart"></canvas>
+      </div>
+    </div>
+    <div class="col-sm-3">
+      <div>
+         <canvas id="networkInChart"></canvas>
+      </div>
+    </div>
+    <div class="col-sm-3">
+      <div>
+         <canvas id="networkOutPacketsChart"></canvas>
+      </div>
+    </div>
+    <div class="col-sm-3">
+      <div>
+         <canvas id="networkInPacketsChart"></canvas>
+      </div>
+    </div>
+
+  </div>
+</div>
+   </div>
+   <div id="alerts-tab" role="tabpanel" class="tab-pane">
+      <div class="incident-stats">
+         <div class="stats-container big-stat-block">
+            <span class="stat-content" style="font-weight: bolder;color: rgb(0, 115, 255);">3</span>
+            <span class="stat-label">All</span>
+         </div>
+         <div class="stats-container big-stat-block">
+            <span class="stat-content" style="font-weight: bolder;color: red;">3</span>
+            <span class="stat-label">Critical</span>
+         </div>
+         <div class="stats-container big-stat-block">
+            <span class="stat-content" style="font-weight: bolder;color: orange;">0</span>
+            <span class="stat-label">Warning</span>
+         </div>
+         <div class="stats-container big-stat-block">
+            <span class="stat-content" style="font-weight: bolder;color: green;">0</span>
+            <span class="stat-label">Ok</span>
+         </div>
+         <div class="stats-container big-stat-block">
+            <span class="stat-content" style="font-weight: bolder;color: purple;">0</span>
+            <span class="stat-label">Info</span>
+         </div>
+         <div class="stats-container big-stat-block">
+            <span class="stat-content" style="font-weight: bolder;color: teal;">0</span>
+            <span class="stat-label">Observed</span>
+         </div>
+      </div>
+      <hr>
+      <div class="advanced-search">
+         <form action="/library/instance-types" method="get" role="form" class="form-inline instance-type-search-form" data-target=".instance-type-data">
+            <!-- search -->
+            <div class="input-group searchBar">
+               <input type="text" class="form-control" id="terraformResources-search" name="filter.phrase" value="" autofocus="true" placeholder="Search" tabindex="1">
+               <span class="input-group-btn">
+                  <button class="btn btn-primary search-btn" type="button"><span class="glyphicon glyphicon-search"></span></button>
+               </span>
+            </div>
+            <!-- search filters-->
+            <!--show each filter-->
+
+         <div class="input-group ">
+            <!--option source type-->
+            <select id="filter-opsramp-state" name="filter.state" class="form-control input-sm filter-input">
+            <option value="all">All States</option>
+            <option value="critical">Critical</option>
+            <option value="info">Info</option>
+            <option value="observed">Observed</option>
+            <option value="ok">Ok</option>
+            <option value="warning">Warning</option>
+         </select>
+         </div>
+
+         <div class="input-group ">
+            <!--option source type-->
+            <select id="filter-opsramp-status" name="filter.status" class="form-control input-sm filter-input">
+               <option value="all">All Statuses</option>
+               <option value="acknowledged">Acknowledged</option>
+               <option value="correlated">Correlated</option>
+               <option value="closed">Closed</option>
+               <option value="open">Open</option>
+               <option value="suppressed">Suppressed</option>
+               <option value="ticketed">Ticketed</option>
+            </select>
+         </div>
+
+      <!--quick filters-->
+            <!-- advanced filters -->
+            <div class="collapse spaced-container advanced-filter" id="advanced-filter"></div>
+            <!--actions-->
+            <div class="pull-right btn-toolbar hidden-xs"></div>
+            <input type="hidden" name="_csrf" value="48a973d6-7ab3-41f4-8eb4-94634afdab7f">
+         </form>
+         <hr>
+      </div>
+      <table class="table table-striped current saved-envs">
+         <thead>
+            <th>ID</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>State</th>
+            <th>Subject</th>
+         </thead>
+         <tbody>
+            <tr>
+               <td><a href="#controller-details-modal" data-toggle="modal" data-remote="false" class="opsAlert">8142793</a></td>
+               <td>Monitoring</td>
+               <td>Open</td>
+               <td>Critical</td>
+               <td>Forecast of reaching capacity in 1 day</td>
+            </tr>
+            <tr>
+               <td><a href="#controller-details-modal" data-toggle="modal" data-remote="false" class="opsAlert">7856134</a></td>
+               <td>Monitoring</td>
+               <td>Open</td>
+               <td>Critical</td>
+               <td>A Significant Change is Detected on system.cpu.utilization </td>
+            </tr>
+            <tr>
+               <td><a href="#controller-details-modal" data-toggle="modal" data-remote="false" class="opsAlert">3918526</a></td>
+               <td>Monitoring</td>
+               <td>Open</td>
+               <td>Critical</td>
+               <td>Service availability impacted</td>
+            </tr>
+         </tbody>
+      </table>
+   </div>
+   <div id="logs-tab" role="tabpanel" class="tab-pane">
+      <div class="row">
+         <div style="max-height: 200px;" class="chart-container">
+            <canvas id="logsChart"></canvas>
+         </div>
+       </div>
+    
+      <div class="advanced-search">
+         <form action="/library/instance-types" method="get" role="form" class="form-inline instance-type-search-form" data-target=".instance-type-data">
+            <!-- search -->
+            <div class="input-group searchBar">
+               <input type="text" class="form-control" id="terraformResources-search" name="filter.phrase" value="" autofocus="true" placeholder="Search" tabindex="1">
+               <span class="input-group-btn">
+                  <button class="btn btn-primary search-btn" type="button"><span class="glyphicon glyphicon-search"></span></button>
+               </span>
+            </div>
+            <!-- search filters-->
+            <!--show each filter-->
+
+         <div class="input-group ">
+            <!--option source type-->
+            <select id="filter-opsramp-state" name="filter.state" class="form-control input-sm filter-input">
+            <option value="all">All States</option>
+            <option value="critical">Critical</option>
+            <option value="info">Info</option>
+            <option value="observed">Observed</option>
+            <option value="ok">Ok</option>
+            <option value="warning">Warning</option>
+         </select>
+         </div>
+
+         <div class="input-group ">
+            <!--option source type-->
+            <select id="filter-opsramp-status" name="filter.status" class="form-control input-sm filter-input">
+               <option value="all">All Statuses</option>
+               <option value="acknowledged">Acknowledged</option>
+               <option value="correlated">Correlated</option>
+               <option value="closed">Closed</option>
+               <option value="open">Open</option>
+               <option value="suppressed">Suppressed</option>
+               <option value="ticketed">Ticketed</option>
+            </select>
+         </div>
+
+      <!--quick filters-->
+            <!-- advanced filters -->
+            <div class="collapse spaced-container advanced-filter" id="advanced-filter"></div>
+            <!--actions-->
+            <div class="pull-right btn-toolbar hidden-xs"></div>
+            <input type="hidden" name="_csrf" value="48a973d6-7ab3-41f4-8eb4-94634afdab7f">
+         </form>
+         <hr>
+      </div>
+      <table class="table table-striped current saved-envs">
+         <thead>
+            <th>Level</th>
+            <th>Timestamp</th>
+            <th>Message</th>
+         </thead>
+         <tbody>
+            <tr>
+               <td>Warn</td>
+               <td>Open</td>
+               <td>Forecast of reaching capacity in 1 day</td>
+            </tr>
+            <tr>
+               <td>Info</td>
+               <td>Open</td>
+               <td>A Significant Change is Detected on system.cpu.utilization </td>
+            </tr>
+            <tr>
+               <td>Debug</td>
+               <td>Critical</td>
+               <td>Service availability impacted</td>
+            </tr>
+         </tbody>
+      </table>
+
+   </div>
+   <div id="application-monitoring-tab" role="tabpanel" class="tab-pane">
+      <hr>
+      <p>test</p>
+   </div>
+</div>
+
+<!-- Alerts Modal -->
+<div class="modal fade" tabindex="-1" role="dialog" id="controller-details-modal">
+   <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+               <span aria-hidden="true"><svg class="close-icon"><use xlink:href="/assets/icons.svg#close-window"></use></svg></span>
+            </button>
+            <h4 class="modal-title">Alert Details</h4>
+         </div>
+         <div class="modal-body">
+            <div class="modal-resource-header">
+		      </div>
+            <div class="incident-stats">
+               <div class="stats-container big-stat-block">
+                  <span class="alert-header-data">0</span>
+                  <span class="stat-label">Open From</span>
+               </div>
+               <div class="stats-container big-stat-block">
+                  <span class="alert-header-data">12</span>
+                  <span class="stat-label">Total Occurences</span>
+               </div>
+               <div class="stats-container big-stat-block">
+                  <span class="alert-header-data">19-Jul-2019 02:43:44 PM IST</span>
+                  <span class="stat-label">First Alert Time</span>
+               </div>
+               <div class="stats-container big-stat-block">
+                  <span class="alert-header-data">19-Jul-2019 02:43:44 PM IST</span>
+                  <span class="stat-label">Last Alert Time</span>
+               </div>
+            </div>
+            <table class="table table-striped current saved-envs">
+               <thead>
+                  <th>Incident ID</th>
+                  <th>Subject</th>
+                  <th>Devices</th>
+                  <th>Priority</th>
+                  <th>Status</th>
+                  <th>Owner</th>
+               </thead>
+               <tbody>
+                  <tr>
+                     <td>INC000000345822</td>
+                     <td>Critical</td>
+                     <td>Critical</td>
+                     <td>Testing 123</td>
+                     <td>Open</td>
+                     <td>Testing 123</td>
+                  </tr>
+                  <tr>
+                     <td>INC000000514257</td>
+                     <td>Critical</td>
+                     <td>Critical</td>
+                     <td>Testing 123</td>
+                     <td>Open</td>
+                     <td>Testing 123</td>
+                  </tr>
+                  <tr>
+                     <td>INC000000936221</td>
+                     <td>Critical</td>
+                     <td>Critical</td>
+                     <td>Testing 123</td>
+                     <td>Open</td>
+                     <td>Testing 123</td>
+                  </tr>
+               </tbody>
+            </table>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+         </div>
+      </div>
+   </div>
+</div>
+
+<!-- Alerts Modals JavaScript -->
+<script nonce="{{webnonce}}">
+   test = document.getElementsByClassName("opsAlert");
+
+   function myFunction(item) {
+      testElement.addEventListener("click", function(e){
+         $("#controller-details-modal").modal();
+      })
+   }
+
+   for (let item of test) {
+      item.addEventListener("click", function(e){
+         $("#controller-details-modal").modal();
+      })
+   }
+
+</script>
+
+<!-- CPU Chart -->
+<script nonce="{{webnonce}}">
+  const cpuctx = document.getElementById('cpuChart');
+  new Chart(cpuctx, {
+    type: 'line',
+    data: {
+      labels: ['12:00', '12:15', '12:30', '12:45', '1:00', '1:15'],
+      datasets: [{
+        data: [65, 59, 80, 81, 56, 55, 40],
+        pointStyle: false,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+         y: {
+            min: 0,
+            max: 100,
+            grid: {
+               display: true
+            },
+            border: {
+               display: false
+            }
+         },
+         x: {
+            grid: {
+               display: false
+            },
+         },
+      },
+      plugins: {
+         legend: {
+            display: false,
+         },
+         title: {
+            display: true,
+            text: 'CPU Utilization',
+            align: 'start'
+         }
+      }
+    }
+  });
+</script>
+
+<!-- RAM Chart -->
+<script nonce="{{webnonce}}">
+  const ramctx = document.getElementById('ramChart');
+
+  new Chart(ramctx, {
+    type: 'line',
+    data: {
+      labels: ['12:00', '12:15', '12:30', '12:45', '1:00', '1:15'],
+      datasets: [{
+        data: [12, 18, 25, 20, 24, 18],
+        pointStyle: false,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+         y: {
+            min: 0,
+            max: 100,
+            grid: {
+               display: true
+            },
+            border: {
+               display: false
+            }
+         },
+         x: {
+            grid: {
+               display: false
+            },
+         },
+      },
+      plugins: {
+         legend: {
+            display: false,
+            //position: 'bottom',
+         },
+         title: {
+            display: true,
+            text: 'Memory Utilization',
+            align: 'start'
+         }
+      }
+    }
+  });
+</script>
+
+<!-- Disk Write Bytes Chart -->
+<script nonce="{{webnonce}}">
+  const diskWriteBytesCTX = document.getElementById('diskWriteBytesChart');
+
+  new Chart(diskWriteBytesCTX, {
+    type: 'line',
+    data: {
+      labels: ['12:00', '12:15', '12:30', '12:45', '1:00', '1:15'],
+      datasets: [{
+        data: [65, 59, 80, 81, 56, 55, 40],
+        pointStyle: false,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+         y: {
+            grid: {
+               display: true
+            },
+            border: {
+               display: false
+            }
+         },
+         x: {
+            grid: {
+               display: false
+            },
+         },
+      },
+      plugins: {
+         legend: {
+            display: false,
+         },
+         title: {
+            display: true,
+            text: 'Disk Write Bytes',
+            align: 'start'
+         }
+      }
+    }
+  });
+</script>
+
+<!-- Disk Write Operations Chart -->
+<script nonce="{{webnonce}}">
+  const diskWriteOperationsCTX = document.getElementById('diskWriteOperationsChart');
+
+  new Chart(diskWriteOperationsCTX, {
+    type: 'line',
+    data: {
+      labels: ['12:00', '12:15', '12:30', '12:45', '1:00', '1:15'],
+      datasets: [{
+        data: [65, 59, 80, 81, 56, 55, 40],
+        pointStyle: false,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+         y: {
+            grid: {
+               display: true
+            },
+            border: {
+               display: false
+            }
+         },
+         x: {
+            grid: {
+               display: false
+            },
+         },
+      },
+      plugins: {
+         legend: {
+            display: false,
+         },
+         title: {
+            display: true,
+            text: 'Disk Write Operations',
+            align: 'start'
+         }
+      }
+    }
+  });
+</script>
+
+<!-- Disk Read Bytes Chart -->
+<script nonce="{{webnonce}}">
+  const diskReadBytesCTX = document.getElementById('diskReadBytesChart');
+
+  new Chart(diskReadBytesCTX, {
+    type: 'line',
+    data: {
+      labels: ['12:00', '12:15', '12:30', '12:45', '1:00', '1:15'],
+      datasets: [{
+        data: [65, 59, 80, 81, 56, 55, 40],
+        pointStyle: false,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+         y: {
+            grid: {
+               display: true
+            },
+            border: {
+               display: false
+            }
+         },
+         x: {
+            grid: {
+               display: false
+            },
+         },
+      },
+      plugins: {
+         legend: {
+            display: false,
+         },
+         title: {
+            display: true,
+            text: 'Disk Read Bytes',
+            align: 'start'
+         }
+      }
+    }
+  });
+</script>
+
+<!-- Disk Read Operations Chart -->
+<script nonce="{{webnonce}}">
+  const diskReadOperationsCTX = document.getElementById('diskReadOperationsChart');
+
+  new Chart(diskReadOperationsCTX, {
+    type: 'line',
+    data: {
+      labels: ['12:00', '12:15', '12:30', '12:45', '1:00', '1:15'],
+      datasets: [{
+        data: [65, 59, 80, 81, 56, 55, 40],
+        pointStyle: false,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+         y: {
+            grid: {
+               display: true
+            },
+            border: {
+               display: false
+            }
+         },
+         x: {
+            grid: {
+               display: false
+            },
+         },
+      },
+      plugins: {
+         legend: {
+            display: false,
+         },
+         title: {
+            display: true,
+            text: 'Disk Read Operations',
+            align: 'start'
+         }
+      }
+    }
+  });
+</script>
+
+<!-- Network Out Chart -->
+<script nonce="{{webnonce}}">
+  const networkOutCTX = document.getElementById('networkOutChart');
+
+  new Chart(networkOutCTX, {
+    type: 'line',
+    data: {
+      labels: ['12:00', '12:15', '12:30', '12:45', '1:00', '1:15'],
+      datasets: [{
+        data: [65, 59, 80, 81, 56, 55, 40],
+        pointStyle: false,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+         y: {
+            grid: {
+               display: true
+            },
+            border: {
+               display: false
+            }
+         },
+         x: {
+            grid: {
+               display: false
+            },
+         },
+      },
+      plugins: {
+         legend: {
+            display: false,
+         },
+         title: {
+            display: true,
+            text: 'Network Out (Bytes)',
+            align: 'start'
+         }
+      }
+    }
+  });
+</script>
+
+<!-- Network In Chart -->
+<script nonce="{{webnonce}}">
+  const networkInCTX = document.getElementById('networkInChart');
+
+  new Chart(networkInCTX, {
+    type: 'line',
+    data: {
+      labels: ['12:00', '12:15', '12:30', '12:45', '1:00', '1:15'],
+      datasets: [{
+        data: [65, 59, 80, 81, 56, 55, 40],
+        pointStyle: false,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+         y: {
+            grid: {
+               display: true
+            },
+            border: {
+               display: false
+            }
+         },
+         x: {
+            grid: {
+               display: false
+            },
+         },
+      },
+      plugins: {
+         legend: {
+            display: false,
+         },
+         title: {
+            display: true,
+            text: 'Network In (Bytes)',
+            align: 'start'
+         }
+      }
+    }
+  });
+</script>
+
+<!-- Network Out Packets Chart -->
+<script nonce="{{webnonce}}">
+  const networkOutPacketsCTX = document.getElementById('networkOutPacketsChart');
+
+  new Chart(networkOutPacketsCTX, {
+    type: 'line',
+    data: {
+      labels: ['12:00', '12:15', '12:30', '12:45', '1:00', '1:15'],
+      datasets: [{
+        data: [65, 59, 80, 81, 56, 55, 40],
+        pointStyle: false,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+         y: {
+            grid: {
+               display: true
+            },
+            border: {
+               display: false
+            }
+         },
+         x: {
+            grid: {
+               display: false
+            },
+         },
+      },
+      plugins: {
+         legend: {
+            display: false,
+         },
+         title: {
+            display: true,
+            text: 'Network Out (# of Packets)',
+            align: 'start'
+         }
+      }
+    }
+  });
+</script>
+
+<!-- Network In Chart -->
+<script nonce="{{webnonce}}">
+  const networkInPacketsCTX = document.getElementById('networkInPacketsChart');
+
+  new Chart(networkInPacketsCTX, {
+    type: 'line',
+    data: {
+      labels: ['12:00', '12:15', '12:30', '12:45', '1:00', '1:15'],
+      datasets: [{
+        data: [125, 30, 156, 13, 188, 22, 40],
+        pointStyle: false,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+         y: {
+            grid: {
+               display: true
+            },
+            border: {
+               display: false
+            }
+         },
+         x: {
+            grid: {
+               display: false
+            },
+         },
+      },
+      plugins: {
+         legend: {
+            display: false,
+         },
+         title: {
+            display: true,
+            text: 'Network In (# of Packets)',
+            align: 'start'
+         }
+      }
+    }
+  });
+</script>
+
+<!-- Logs Chart -->
+<script nonce="{{webnonce}}">
+  const logsCTX = document.getElementById('logsChart');
+  new Chart(logsCTX, {
+    type: 'bar',
+    data: {
+      labels: ['12:00', '12:15', '12:30', '12:45', '1:00', '1:15'],
+      datasets: [{
+         label: 'My First Dataset',
+         data: [65, 59, 80, 81, 56, 55, 40],
+         backgroundColor: "red",
+      },
+      {
+         label: 'My First Dataset',
+         data: [65, 59, 80, 81, 56, 55, 40],
+         backgroundColor: "blue",
+      }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+         y: {
+            stacked: true,
+            grid: {
+               display: true
+            },
+            border: {
+               display: false
+            }
+         },
+         x: {
+            stacked: true,
+            grid: {
+               display: false
+            },
+         },
+      },
+      plugins: {
+         legend: {
+            display: false,
+         },
+         title: {
+            display: true,
+            text: 'Network In (# of Packets)',
+            align: 'start'
+         }
+      }
+    }
+  });
+</script>
+
+<style>
+.badge {
+	background-color: #632CA6;
+}
+
+.alert-header-data {
+   font-size: 16px;
+}
+
+.big-stat-block {
+  margin-top: 15px;
+  margin-bottom: 40px;
+}
+
+.resource-detail .type-logo .logo {
+	margin-top: 0px;
+}
+.instance .incident-stats .status-icon {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.instance .incident-stats {
+  margin-bottom: 22px;
+}
+</style>
